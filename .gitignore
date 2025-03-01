@@ -50,3 +50,8 @@ app.*.map.json
 # Ignore Firebase options Dart file
 /lib/firebase_options.dart
 
+/lib/features/Extra
+/lib/features/warde_home/data
+/lib/features/faculty/data
+/assets
+/screenshots

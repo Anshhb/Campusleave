@@ -88,6 +88,8 @@ class UserModel {
   final String profilePic;
   final String banner;
   final String role;
+  final String faEmail;
+  final String wardenEmail;
 
   UserModel({
     required this.uid,
@@ -96,6 +98,8 @@ class UserModel {
     required this.profilePic,
     required this.banner,
     required this.role,
+    required this.faEmail,
+    required this.wardenEmail,
   });
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
@@ -106,6 +110,8 @@ class UserModel {
       profilePic: map['profilePic'] ?? Constants.avatarDefault,
       banner: map['banner'] ?? Constants.bannerDefault,
       role: map['role'] ?? 'student', // Default to 'student' if not provided
+      faEmail: map['faEmail'] ?? '',
+      wardenEmail: map['wardenEmail'] ?? '', // Default to 'student' if not provided
     );
   }
 
@@ -117,6 +123,8 @@ class UserModel {
       'profilePic': profilePic,
       'banner': banner,
       'role': role,
+      'faEmail':faEmail,
+      'wardenEmail': wardenEmail
     };
   }
 
@@ -127,6 +135,8 @@ class UserModel {
     String? profilePic,
     String? banner,
     String? role,
+    String? faEmail,
+    String? wardenEmail,
   }) {
     return UserModel(
       uid: uid ?? this.uid,
@@ -135,6 +145,8 @@ class UserModel {
       profilePic: profilePic ?? this.profilePic,
       banner: banner ?? this.banner,
       role: role ?? this.role,
+      faEmail: faEmail ?? this.faEmail,
+      wardenEmail: wardenEmail ?? this.wardenEmail,
     );
   }
 }

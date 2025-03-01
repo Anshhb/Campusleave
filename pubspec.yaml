@@ -2,7 +2,7 @@ name: campusleave
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.4.1 <4.0.0'
+  sdk: ">=3.4.1 <4.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -30,7 +30,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -46,10 +45,13 @@ dependencies:
   file_picker: ^8.0.6
   url_launcher: ^6.3.0
   intl: ^0.19.0
-  fluttertoast: ^8.2.6
+  fluttertoast: ^8.2.8
   firebase_admin: ^0.2.0-dev.7
   http: ^0.13.6
-  flutter_dotenv: ^5.1.0
+  csv: ^6.0.0
+  path_provider: ^2.1.5
+  google_fonts: ^4.0.4
+  flutter_launcher_icons: ^0.14.3
 
 dev_dependencies:
   flutter_test:
@@ -65,9 +67,14 @@ dev_dependencies:
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/mail.png"
+  adaptive_icon_background: "#ffffff"
+  adaptive_icon_foreground: "assets/images/mail.png"
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -78,6 +85,7 @@ flutter:
     - assets/images/IITJ_logo.png
     - assets/images/google.png
     - assets/images/mail.png
+    - assets/G5_Hostel.csv
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
@@ -103,8 +111,6 @@ flutter:
     - family: CustomFont4
       fonts:
         - asset: assets/fonts/Nunito-Bold.ttf
-        
-
 
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic

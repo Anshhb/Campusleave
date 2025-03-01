@@ -13,9 +13,7 @@ During my absence, I assure you that I will [mention any responsibilities or arr
 Thank you for considering my request. I look forward to your favorable response.
 
 Sincerely,
-
 $name
-[Your Student Roll no.]
 [Your Department/Year]
 
 IIT Jodhpur

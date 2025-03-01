@@ -1,7 +1,8 @@
 import 'dart:io';
 import 'package:campusleave/core/providers/storage_repository_provider.dart';
 import 'package:campusleave/core/utils/utils.dart';
-import 'package:campusleave/features/auth/controller/auth_controller.dart';
+import 'package:campusleave/features/user_auth/user_controller/user_auth_controller.dart';
+// import 'package:campusleave/features/auth/controller/auth_controller.dart';
 import 'package:campusleave/features/user_profile/repository/user_profile_repository.dart';
 import 'package:campusleave/models/user_model.dart';
 import 'package:flutter/material.dart';
