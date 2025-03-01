@@ -1,6 +1,6 @@
 # CampusLeave
 
-CampusLeave is a **Flutter-based** leave approval application designed for students and faculty advisors. The app streamlines the leave request process by allowing students to send requests via email, while faculty can approve or decline them with a single click.
+CampusLeave is a **Flutter-based** leave approval application designed for students faculty advisor and warden. The app streamlines the leave request process by allowing students to send requests via email, while faculty can approve or decline them with a single click.
 
 ## 📌 Features
 
@@ -11,10 +11,10 @@ CampusLeave is a **Flutter-based** leave approval application designed for stude
 - **Recent Activity Drawer**: View sent emails categorized under faculty and warden.
 - **Email Details Page**: See details of sent requests.
 
-### **For Faculty:**
+### **For Faculty and Warden:**
 
 - **View Requests**: A dedicated home screen to see all received requests.
-- **Accept/Decline Requests**: Faculty can approve or reject requests directly from the email details page.
+- **Accept/Decline Requests**: Faculty and warden can approve or reject requests directly from the email details page.
 - **Accepted & Declined Emails Page**: View categorized leave requests.
 
 ## 🖥️ Tech Stack
