@@ -1,0 +1,2 @@
+C:/flutter_projects/campusleave/android/app/.cxx/RelWithDebInfo/21s731b7/x86/CMakeFiles/edit_cache.dir
+C:/flutter_projects/campusleave/android/app/.cxx/RelWithDebInfo/21s731b7/x86/CMakeFiles/rebuild_cache.dir

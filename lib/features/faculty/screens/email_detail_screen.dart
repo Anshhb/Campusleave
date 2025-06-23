@@ -1,135 +1,176 @@
-// import 'package:flutter/material.dart';
-
-// class EmailDetailsScreen extends StatelessWidget {
-//   final Map<String, dynamic> request;
-
-//   const EmailDetailsScreen({super.key, required this.request});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text(request['subject'] as String? ?? ''),
-//       ),
-//       body: SingleChildScrollView(
-//         padding: const EdgeInsets.all(16.0),
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             Text(
-//               'From: ${request['userId'] as String? ?? ''}', // Replace with actual sender email ID field
-//               style: const TextStyle(fontWeight: FontWeight.bold),
-//             ),
-//             const SizedBox(height: 10),
-//             Text('Subject: ${request['subject'] as String? ?? ''}'),
-//             const SizedBox(height: 10),
-//             Text(request['body'] as String? ?? ''), // Replace with actual email body field
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-// import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:flutter/material.dart';
-
-// class EmailDetailsScreen extends StatelessWidget {
-//   final Map<String, dynamic> request;
-//   final String requestId;
-
-//   const EmailDetailsScreen({required this.request, required this.requestId, super.key});
-
-//   void _updateRequestStatus(BuildContext context, String status) async {
-//     try {
-//       await FirebaseFirestore.instance
-//           .collection('emailRequests')
-//           .doc(requestId)
-//           .update({'status': status});
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(content: Text('Request status updated to $status')),
-//       );
-//       Navigator.of(context).pop();
-//     } catch (e) {
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(content: Text('Failed to update request status: $e')),
-//       );
-//     }
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text(request['subject'] ?? 'Leave Request'),
-//       ),
-//       body: Padding(
-//         padding: const EdgeInsets.all(16.0),
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             Text(
-//               request['body'] ?? '',
-//               style: const TextStyle(fontSize: 16.0),
-//             ),
-//             const SizedBox(height: 20.0),
-//             Row(
-//               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//               children: [
-//                 ElevatedButton(
-//                   onPressed: () => _updateRequestStatus(context, 'approved'),
-//                   style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-//                   child: const Text('Accept',style: TextStyle(color: Colors.white), ),
-//                 ),
-//                 ElevatedButton(
-//                   onPressed: () => _updateRequestStatus(context, 'declined'),
-//                   style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-//                   child: const Text('Decline', style: TextStyle(color: Colors.white),),
-//                 ),
-//               ],
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-//updated
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class EmailDetailsScreen extends StatelessWidget {
+class EmailDetailsScreen extends StatefulWidget {
   final String requestId;
   final Map<String, dynamic> request;
 
+  const EmailDetailsScreen({
+    required this.requestId,
+    required this.request,
+    super.key,
+  });
 
-  const EmailDetailsScreen(
-      {required this.requestId,required this.request, super.key});
+  @override
+  State<EmailDetailsScreen> createState() => _EmailDetailsScreenState();
+}
 
-  void _updateRequestStatus(BuildContext context, String status) async {
+class _EmailDetailsScreenState extends State<EmailDetailsScreen> {
+  bool _actionTaken = false;
+
+  Future<void> _updateRequestStatus(String status, {String? reason}) async {
+    if (_actionTaken) return;
+
+    setState(() {
+      _actionTaken = true;
+    });
+
     try {
+      final updateData = {
+        'status': status,
+        if (reason != null) 'declineReason': reason,
+      };
+
       await FirebaseFirestore.instance
           .collection('emailRequests')
-          .doc(requestId)
-          .update({'status': status});
+          .doc(widget.requestId)
+          .update(updateData);
+
+      if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Request status updated to $status'),
+          content: Text(
+            status == 'declined'
+                ? 'Request declined with reason.'
+                : 'Request approved successfully.',
+          ),
           backgroundColor: status == 'approved' ? Colors.green : Colors.red,
+          duration: const Duration(seconds: 1),
         ),
       );
-      Navigator.of(context).pop();
+
+      await Future.delayed(const Duration(milliseconds: 800));
+      if (mounted) Navigator.of(context).pop();
     } catch (e) {
+      if (!mounted) return;
+
+      setState(() {
+        _actionTaken = false;
+      });
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to update request status: $e')),
+        SnackBar(content: Text('Failed to update status: $e')),
       );
     }
   }
 
+  void _showDeclineReasonDialog() {
+    final TextEditingController reasonController = TextEditingController();
+    String? selectedReason;
+    bool showManualInput = false;
+
+    final predefinedReasons = [
+      'Insufficient Information',
+      'Incomplete Documentation',
+      'Violation of Rules',
+      'Leave Duration Too Long',
+      'Health Concerns',
+      'Other',
+    ];
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) => AlertDialog(
+            title: const Text('Decline Reason',
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                DropdownButtonFormField<String>(
+                  value: selectedReason,
+                  items: predefinedReasons
+                      .map((reason) => DropdownMenuItem(
+                            value: reason,
+                            child: Text(reason),
+                          ))
+                      .toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      selectedReason = value;
+                      showManualInput = value == 'Other';
+                    });
+                  },
+                  decoration: const InputDecoration(
+                    labelText: 'Select a reason',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 15),
+                if (showManualInput)
+                  TextField(
+                    controller: reasonController,
+                    maxLines: 3,
+                    decoration: const InputDecoration(
+                      hintText: 'Enter the reason',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                style: TextButton.styleFrom(
+                  backgroundColor: Colors.grey.shade300,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel', style: TextStyle(color: Colors.black)),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  String reason = '';
+
+                  if (selectedReason == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Please select a reason')),
+                    );
+                    return;
+                  }
+
+                  if (selectedReason == 'Other') {
+                    reason = reasonController.text.trim();
+                    if (reason.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Please enter the reason')),
+                      );
+                      return;
+                    }
+                  } else {
+                    reason = selectedReason!;
+                  }
+
+                  Navigator.pop(context); // Close dialog
+                  _updateRequestStatus('declined', reason: reason);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                ),
+                child: const Text('Decline', style: TextStyle(color: Colors.white)),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final request = widget.request;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Email Details',
@@ -165,32 +206,33 @@ class EmailDetailsScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       ElevatedButton(
-                        onPressed: () =>
-                            _updateRequestStatus(context, 'approved'),
+                        onPressed: _actionTaken
+                            ? null
+                            : () => _updateRequestStatus('approved'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green,
                           padding: const EdgeInsets.symmetric(
                               horizontal: 30, vertical: 12),
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8)),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
                         child: const Text('Accept',
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 16)),
+                            style: TextStyle(color: Colors.white, fontSize: 16)),
                       ),
                       ElevatedButton(
-                        onPressed: () =>
-                            _updateRequestStatus(context, 'declined'),
+                        onPressed:
+                            _actionTaken ? null : () => _showDeclineReasonDialog(),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.red,
                           padding: const EdgeInsets.symmetric(
                               horizontal: 30, vertical: 12),
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8)),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
                         child: const Text('Decline',
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 16)),
+                            style: TextStyle(color: Colors.white, fontSize: 16)),
                       ),
                     ],
                   ),

@@ -1,22 +1,22 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter/material.dart';
 
 class FirebaseAuthServices {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<User?> signUpWithEmailAndPassword(
-      String email, String password) async {
+      BuildContext context, String email, String password) async {
     try {
       UserCredential credential = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
       return credential.user;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'email-already-in-use') {
-        Fluttertoast.showToast(msg: 'The email address is already in use.');
+        _showSnackBar(context, 'The email address is already in use.');
       } else {
-        Fluttertoast.showToast(msg: 'An error occurred: ${e.code}');
+        _showSnackBar(context, 'An error occurred: ${e.code}');
       }
     }
 
@@ -24,16 +24,16 @@ class FirebaseAuthServices {
   }
 
   Future<User?> signInWithEmailAndPassword(
-      String email, String password) async {
+      BuildContext context, String email, String password) async {
     try {
       UserCredential credential = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
       return credential.user;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found' || e.code == 'wrong-password') {
-        Fluttertoast.showToast(msg: 'Invalid email or password.');
+        _showSnackBar(context, 'Invalid email or password.');
       } else {
-        Fluttertoast.showToast(msg: 'An error occurred: ${e.code}');
+        _showSnackBar(context, 'An error occurred: ${e.code}');
       }
     }
 
@@ -49,10 +49,20 @@ class FirebaseAuthServices {
       }
       return null;
     } catch (e) {
-      // print("Error getting user role: $e");
       return null;
     }
   }
 
-  logOut() {}
+  void logOut() {
+    _auth.signOut();
+  }
+
+  void _showSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
 }
